@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Panadería del Hogar</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500&display=swap"
+    rel="stylesheet" />
+  <link rel="stylesheet" href="estilo.css" />
+</head>
+
+<body>
+
+  <!--HERO -->
+  <header class="hero">
+    <div class="hero-bg"></div>
+    <div class="hero-grain"></div>
+    <nav class="navbar">
+      <div class="brand">
+        <span class="brand-icon">🍞</span>
+        <div class="brand-text">
+          <span class="brand-name">Panadería del Hogar</span>
+          <span class="brand-sub">· Pan Fresco Todos los Días ·</span>
+        </div>
+      </div>
+      <button class="cart-trigger" id="cartTrigger" aria-label="Abrir carrito">
+        <span class="cart-icon">🛒</span>
+        <span class="cart-label">Mi Canasta</span>
+        <span class="cart-badge" id="cartBadge">0</span>
+      </button>
+    </nav>
+
+    <div class="hero-content">
+      <p class="hero-eyebrow">Horneado esta mañana</p>
+      <h1 class="hero-title">El sabor<br /><em>de casa</em></h1>
+      <p class="hero-desc">Panes artesanales elaborados con recetas familiares, ingredientes naturales y el calor de
+        siempre.</p>
+      <a href="#productos" class="hero-cta">Ver productos</a>
+    </div>
+
+    <div class="hero-scroll">↓</div>
+  </header>
+
+  <!-- ░░ FEATURES ░░ -->
+  <section class="features">
+    <div class="feature-item">
+      <span class="feature-ico">🌅</span>
+      <p>Horneado<br />cada mañana</p>
+    </div>
+    <div class="feature-item">
+      <span class="feature-ico">🌾</span>
+      <p>Ingredientes<br />naturales</p>
+    </div>
+    <div class="feature-item">
+      <span class="feature-ico">🚚</span>
+      <p>Delivery<br />a domicilio</p>
+    </div>
+    <div class="feature-item">
+      <span class="feature-ico">❤️</span>
+      <p>Receta<br />familiar</p>
+    </div>
+  </section>
+
+  <!-- ░░ PRODUCTOS ░░ -->
+  <section class="productos-section" id="productos">
+    <div class="section-header">
+      <span class="section-eyebrow">Selección del día</span>
+      <h2 class="section-title">Nuestros Panes</h2>
+      <div class="section-rule"></div>
+    </div>
+
+    <!-- FILTROS -->
+    <div class="filtros" id="filtros">
+      <button class="filtro active" data-cat="todos">Todos</button>
+      <button class="filtro" data-cat="Clásicos">Clásicos</button>
+      <button class="filtro" data-cat="Especiales">Especiales</button>
+      <button class="filtro" data-cat="Saludable">Saludable</button>
+      <button class="filtro" data-cat="Dulces">Dulces</button>
+    </div>
+
+    <div class="products-grid" id="productsGrid">
+      <!-- Cards generadas por JS -->
+    </div>
+  </section>
+
+  <!-- ░░ COMPRAS ░░ -->
+  <section class="compras-section" id="comprasSection">
+    <div class="section-header">
+      <span class="section-eyebrow">Historial</span>
+      <h2 class="section-title">Mis Compras</h2>
+      <div class="section-rule"></div>
+    </div>
+    <div class="compras-empty" id="comprasEmpty">
+      <span class="compras-empty-icon">🧾</span>
+      <p>Aún no tienes compras realizadas.<br />¡Empieza a elegir tus panes!</p>
+    </div>
+    <div class="compras-list" id="comprasList"></div>
+  </section>
+
+  <!-- ░░ FOOTER ░░ -->
+  <footer class="site-footer">
+    <span class="footer-logo">🍞 Panadería del Hogar</span>
+    <p>Lima, Perú · Hecho con ❤️ y mucha harina</p>
+  </footer>
+
+  <!-- ░░ CARRITO SIDEBAR ░░ -->
+  <div class="cart-overlay" id="cartOverlay"></div>
+  <aside class="cart-sidebar" id="cartSidebar">
+    <div class="cart-header">
+      <h3 class="cart-title">🛒 Tu Canasta</h3>
+      <button class="cart-close" id="cartClose">✕</button>
+    </div>
+
+    <div class="cart-body" id="cartBody">
+      <div class="cart-empty-state">
+        <span>🧺</span>
+        <p>Tu canasta está vacía.<br />¡Agrega panes fresquitos!</p>
+      </div>
+    </div>
+
+    <div class="cart-footer" id="cartFooter" style="display:none">
+      <div class="cart-subtotal">
+        <span>Subtotal</span>
+        <span id="cartSubtotal">S/ 0.00</span>
+      </div>
+      <div class="cart-total-row">
+        <span>Total</span>
+        <span id="cartTotal">S/ 0.00</span>
+      </div>
+      <button class="pay-btn" id="payBtn">
+        <span class="pay-icon">💳</span> Pagar ahora
+      </button>
+    </div>
+  </aside>
+
+  <!-- ░░ MODAL PAGO ░░ -->
+  <div class="pay-modal" id="payModal">
+    <div class="pay-modal-box">
+      <div class="check-ring" id="checkRing">
+        <svg class="check-svg" viewBox="0 0 60 60" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle class="check-circle" cx="30" cy="30" r="27" stroke="#27ae60" stroke-width="3" />
+          <polyline class="check-mark" points="17,31 26,40 44,22" stroke="#27ae60" stroke-width="3.5"
+            stroke-linecap="round" stroke-linejoin="round" />
+        </svg>
+      </div>
+      <h2 class="pay-modal-title" id="payModalTitle">¡Pago realizado!</h2>
+      <p class="pay-modal-msg" id="payModalMsg">Tu pedido fue registrado con éxito.<br />¡Gracias por elegirnos! 🍞</p>
+      <button class="pay-modal-close" id="payModalClose">Continuar comprando</button>
+    </div>
+  </div>
+
+  <!-- ░░ TOAST ░░ -->
+  <div class="toast" id="toast"></div>
+
+  <script src="funciones.js"></script>
+</body>
+
+</html>
