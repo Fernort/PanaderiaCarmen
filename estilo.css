@@ -107,6 +107,9 @@ body {
   object-fit: contain;
   flex-shrink: 0;
   border-radius: 12px;
+  display: block;
+  /* Ayuda si el fondo del PNG/SVG es muy parecido al de la barra */
+  box-shadow: 0 2px 8px rgba(74, 32, 8, 0.15);
 }
 
 .nav-actions {
