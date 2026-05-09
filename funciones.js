@@ -103,8 +103,12 @@ const comprasList = document.getElementById('comprasList');
 const comprasEmpty = document.getElementById('comprasEmpty');
 const toastEl = document.getElementById('toast');
 const filtrosBtns = document.querySelectorAll('.filtro');
+const navBurger = document.getElementById('navBurger');
+const navBackdrop = document.getElementById('navBackdrop');
+const navMobilePanel = document.getElementById('navMobilePanel');
 
 const esPaginaTienda = Boolean(productsGrid);
+const NAV_MOBILE_MAX_PX = 768;
 
 /* ──────────────────────────────────────────────
    Persistencia (comparte carrito e historial entre páginas)
@@ -278,17 +282,58 @@ function renderCarritoBody() {
 /* ──────────────────────────────────────────────
    CARRITO: Abrir / Cerrar
 ────────────────────────────────────────────── */
+function syncNavbarHeight() {
+  const nav = document.querySelector('.navbar');
+  if (nav) {
+    const h = Math.round(nav.getBoundingClientRect().height);
+    document.documentElement.style.setProperty('--navbar-h', `${h}px`);
+  }
+}
+
+function syncBodyScrollLock() {
+  const cartAbierto = cartSidebar?.classList.contains('open');
+  const modalAbierto = payModal?.classList.contains('open');
+  const menuAbierto = document.body.classList.contains('nav-mobile-open');
+  document.body.style.overflow = cartAbierto || modalAbierto || menuAbierto ? 'hidden' : '';
+}
+
+function cerrarMenuMobile() {
+  document.body.classList.remove('nav-mobile-open');
+  navBurger?.setAttribute('aria-expanded', 'false');
+  navBurger?.setAttribute('aria-label', 'Abrir menú');
+  navMobilePanel?.setAttribute('aria-hidden', 'true');
+  navBackdrop?.setAttribute('aria-hidden', 'true');
+  syncBodyScrollLock();
+}
+
+function abrirMenuMobile() {
+  cerrarCarrito();
+  syncNavbarHeight();
+  document.body.classList.add('nav-mobile-open');
+  navBurger?.setAttribute('aria-expanded', 'true');
+  navBurger?.setAttribute('aria-label', 'Cerrar menú');
+  navMobilePanel?.setAttribute('aria-hidden', 'false');
+  navBackdrop?.setAttribute('aria-hidden', 'false');
+  syncBodyScrollLock();
+}
+
+function toggleMenuMobile() {
+  if (document.body.classList.contains('nav-mobile-open')) cerrarMenuMobile();
+  else abrirMenuMobile();
+}
+
 function abrirCarrito() {
+  cerrarMenuMobile();
   renderCarritoBody();
   cartOverlay?.classList.add('open');
   cartSidebar?.classList.add('open');
-  document.body.style.overflow = 'hidden';
+  syncBodyScrollLock();
 }
 
 function cerrarCarrito() {
   cartOverlay?.classList.remove('open');
   cartSidebar?.classList.remove('open');
-  document.body.style.overflow = '';
+  syncBodyScrollLock();
 }
 
 /* ──────────────────────────────────────────────
@@ -338,12 +383,12 @@ function abrirModalPago() {
   }
 
   payModal?.classList.add('open');
-  document.body.style.overflow = 'hidden';
+  syncBodyScrollLock();
 }
 
 function cerrarModalPago() {
   payModal?.classList.remove('open');
-  document.body.style.overflow = '';
+  syncBodyScrollLock();
 }
 
 /* ──────────────────────────────────────────────
@@ -426,6 +471,12 @@ cartTrigger?.addEventListener('click', abrirCarrito);
 cartClose?.addEventListener('click', cerrarCarrito);
 cartOverlay?.addEventListener('click', cerrarCarrito);
 
+navBurger?.addEventListener('click', toggleMenuMobile);
+navBackdrop?.addEventListener('click', cerrarMenuMobile);
+document.querySelectorAll('a.nav-mobile-link').forEach(a => {
+  a.addEventListener('click', cerrarMenuMobile);
+});
+
 payBtn?.addEventListener('click', confirmarPago);
 
 payModalClose?.addEventListener('click', () => {
@@ -440,9 +491,15 @@ payModalClose?.addEventListener('click', () => {
 
 document.addEventListener('keydown', e => {
   if (e.key === 'Escape') {
+    cerrarMenuMobile();
     cerrarCarrito();
     cerrarModalPago();
   }
+});
+
+window.addEventListener('resize', () => {
+  syncNavbarHeight();
+  if (window.innerWidth > NAV_MOBILE_MAX_PX) cerrarMenuMobile();
 });
 
 /* ──────────────────────────────────────────────
@@ -450,6 +507,7 @@ document.addEventListener('keydown', e => {
 ────────────────────────────────────────────── */
 (function init() {
   cargarEstado();
+  syncNavbarHeight();
   if (filtrosBtns.length) inicializarFiltros();
   renderProductos();
   actualizarCarrito();

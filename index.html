@@ -14,7 +14,7 @@
 
 <body>
 
-  <nav class="navbar navbar--sitio">
+  <nav class="navbar navbar--sitio" aria-label="Principal">
     <a href="index.html" class="brand brand-link">
       <img src="img/logoPan.png" alt="Panadería del Hogar" class="brand-logo" width="52" height="52" decoding="async" />
       <div class="brand-text">
@@ -22,15 +22,33 @@
         <span class="brand-sub">· Pan Fresco Todos los Días ·</span>
       </div>
     </a>
-    <div class="nav-actions">
-      <a href="historial.html" class="nav-link-historial">Mis compras</a>
-      <button class="cart-trigger" id="cartTrigger" aria-label="Abrir carrito">
+    <div class="navbar-end">
+      <div class="nav-desktop-links">
+        <a href="#productos" class="nav-link-historial">Productos</a>
+        <a href="historial.html" class="nav-link-historial">Mis compras</a>
+      </div>
+      <button type="button" class="cart-trigger" id="cartTrigger" aria-label="Abrir carrito">
         <span class="cart-icon">🛒</span>
         <span class="cart-label">Mi Canasta</span>
         <span class="cart-badge" id="cartBadge">0</span>
       </button>
+      <button type="button" class="nav-burger" id="navBurger" aria-label="Abrir menú"
+        aria-expanded="false" aria-controls="navMobilePanel">
+        <span class="nav-burger-bar" aria-hidden="true"></span>
+        <span class="nav-burger-bar" aria-hidden="true"></span>
+        <span class="nav-burger-bar" aria-hidden="true"></span>
+      </button>
     </div>
   </nav>
+
+  <div class="nav-mobile-backdrop" id="navBackdrop" aria-hidden="true"></div>
+  <div class="nav-mobile-panel" id="navMobilePanel" role="dialog" aria-modal="true" aria-label="Menú de navegación" aria-hidden="true">
+    <div class="nav-mobile-inner">
+      <a href="index.html" class="nav-mobile-link nav-mobile-title">Inicio</a>
+      <a href="#productos" class="nav-mobile-link">Productos</a>
+      <a href="historial.html" class="nav-mobile-link">Mis compras</a>
+    </div>
+  </div>
 
   <!--HERO -->
   <header class="hero">
