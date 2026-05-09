@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mis compras — Panadería del Hogar</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500&display=swap"
+    rel="stylesheet" />
+  <link rel="stylesheet" href="estilo.css" />
+</head>
+
+<body class="page-historial">
+
+  <header class="historial-header">
+    <nav class="navbar">
+      <a href="index.html" class="brand brand-link">
+        <img src="img/logo.svg" alt="" class="brand-logo" width="52" height="52" />
+        <div class="brand-text">
+          <span class="brand-name">Panadería del Hogar</span>
+          <span class="brand-sub">· Pan Fresco Todos los Días ·</span>
+        </div>
+      </a>
+      <div class="nav-actions">
+        <a href="index.html#productos" class="nav-link-historial nav-link-historial--muted">Seguir comprando</a>
+        <button class="cart-trigger" id="cartTrigger" aria-label="Abrir carrito">
+          <span class="cart-icon">🛒</span>
+          <span class="cart-label">Mi Canasta</span>
+          <span class="cart-badge" id="cartBadge">0</span>
+        </button>
+      </div>
+    </nav>
+  </header>
+
+  <main class="historial-main">
+    <section class="compras-section" id="comprasSection">
+      <div class="section-header">
+        <span class="section-eyebrow">Historial</span>
+        <h2 class="section-title">Mis Compras</h2>
+        <div class="section-rule"></div>
+      </div>
+      <div class="compras-empty" id="comprasEmpty">
+        <span class="compras-empty-icon">🧾</span>
+        <p>Aún no tienes compras realizadas.<br />¡Empieza a elegir tus panes!</p>
+      </div>
+      <div class="compras-list" id="comprasList"></div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <span class="footer-logo">🍞 Panadería del Hogar</span>
+    <p>Lima, Perú · Hecho con ❤️ y mucha harina</p>
+  </footer>
+
+  <div class="cart-overlay" id="cartOverlay"></div>
+  <aside class="cart-sidebar" id="cartSidebar">
+    <div class="cart-header">
+      <h3 class="cart-title">🛒 Tu Canasta</h3>
+      <button class="cart-close" id="cartClose">✕</button>
+    </div>
+
+    <div class="cart-body" id="cartBody">
+      <div class="cart-empty-state">
+        <span>🧺</span>
+        <p>Tu canasta está vacía.<br />¡Agrega panes fresquitos!</p>
+      </div>
+    </div>
+
+    <div class="cart-footer" id="cartFooter" style="display:none">
+      <div class="cart-subtotal">
+        <span>Subtotal</span>
+        <span id="cartSubtotal">S/ 0.00</span>
+      </div>
+      <div class="cart-total-row">
+        <span>Total</span>
+        <span id="cartTotal">S/ 0.00</span>
+      </div>
+      <button class="pay-btn" id="payBtn">
+        <span class="pay-icon">💳</span> Pagar ahora
+      </button>
+    </div>
+  </aside>
+
+  <div class="pay-modal" id="payModal">
+    <div class="pay-modal-box">
+      <div class="check-ring" id="checkRing">
+        <svg class="check-svg" viewBox="0 0 60 60" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle class="check-circle" cx="30" cy="30" r="27" stroke="#27ae60" stroke-width="3" />
+          <polyline class="check-mark" points="17,31 26,40 44,22" stroke="#27ae60" stroke-width="3.5"
+            stroke-linecap="round" stroke-linejoin="round" />
+        </svg>
+      </div>
+      <h2 class="pay-modal-title" id="payModalTitle">¡Pago realizado!</h2>
+      <p class="pay-modal-msg" id="payModalMsg">Tu pedido fue registrado con éxito.<br />¡Gracias por elegirnos! 🍞</p>
+      <button class="pay-modal-close" id="payModalClose">Ver historial</button>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script src="funciones.js"></script>
+</body>
+
+</html>

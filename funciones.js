@@ -3,6 +3,9 @@
    Lógica del carrito, productos, pago y compras
 ═══════════════════════════════════════════════ */
 
+const STORAGE_CARRITO = 'panaderia_carrito';
+const STORAGE_COMPRAS = 'panaderia_compras';
+
 /* ──────────────────────────────────────────────
    DATOS: Catálogo de productos
 ────────────────────────────────────────────── */
@@ -76,35 +79,71 @@ const PRODUCTOS = [
 /* ──────────────────────────────────────────────
    ESTADO GLOBAL
 ────────────────────────────────────────────── */
-let carrito = {};       // { id: { ...producto, qty } }
-let compras = [];       // historial de compras pagadas
+let carrito = {};
+let compras = [];
 let filtroActivo = 'todos';
 
 /* ──────────────────────────────────────────────
-   REFERENCIAS DOM
+   REFERENCIAS DOM (pueden ser null en historial/index)
 ────────────────────────────────────────────── */
-const productsGrid   = document.getElementById('productsGrid');
-const cartBadge      = document.getElementById('cartBadge');
-const cartBody       = document.getElementById('cartBody');
-const cartFooter     = document.getElementById('cartFooter');
-const cartSubtotal   = document.getElementById('cartSubtotal');
-const cartTotalText  = document.getElementById('cartTotal');
-const cartOverlay    = document.getElementById('cartOverlay');
-const cartSidebar    = document.getElementById('cartSidebar');
-const cartTrigger    = document.getElementById('cartTrigger');
-const cartClose      = document.getElementById('cartClose');
-const payBtn         = document.getElementById('payBtn');
-const payModal       = document.getElementById('payModal');
-const payModalClose  = document.getElementById('payModalClose');
-const comprasList    = document.getElementById('comprasList');
-const comprasEmpty   = document.getElementById('comprasEmpty');
-const toastEl        = document.getElementById('toast');
-const filtrosBtns    = document.querySelectorAll('.filtro');
+const productsGrid = document.getElementById('productsGrid');
+const cartBadge = document.getElementById('cartBadge');
+const cartBody = document.getElementById('cartBody');
+const cartFooter = document.getElementById('cartFooter');
+const cartSubtotal = document.getElementById('cartSubtotal');
+const cartTotalText = document.getElementById('cartTotal');
+const cartOverlay = document.getElementById('cartOverlay');
+const cartSidebar = document.getElementById('cartSidebar');
+const cartTrigger = document.getElementById('cartTrigger');
+const cartClose = document.getElementById('cartClose');
+const payBtn = document.getElementById('payBtn');
+const payModal = document.getElementById('payModal');
+const payModalClose = document.getElementById('payModalClose');
+const comprasList = document.getElementById('comprasList');
+const comprasEmpty = document.getElementById('comprasEmpty');
+const toastEl = document.getElementById('toast');
+const filtrosBtns = document.querySelectorAll('.filtro');
+
+const esPaginaTienda = Boolean(productsGrid);
+
+/* ──────────────────────────────────────────────
+   Persistencia (comparte carrito e historial entre páginas)
+────────────────────────────────────────────── */
+function cargarEstado() {
+  try {
+    const rawC = localStorage.getItem(STORAGE_CARRITO);
+    if (rawC) carrito = JSON.parse(rawC);
+    const rawCo = localStorage.getItem(STORAGE_COMPRAS);
+    if (rawCo) compras = JSON.parse(rawCo);
+  } catch {
+    carrito = {};
+    compras = [];
+  }
+}
+
+function guardarCarrito() {
+  try {
+    localStorage.setItem(STORAGE_CARRITO, JSON.stringify(carrito));
+  } catch { /* ignore */ }
+}
+
+function guardarCompras() {
+  try {
+    localStorage.setItem(STORAGE_COMPRAS, JSON.stringify(compras));
+  } catch { /* ignore */ }
+}
+
+function fechaCompra(compra) {
+  if (!compra.fecha) return new Date();
+  return compra.fecha instanceof Date ? compra.fecha : new Date(compra.fecha);
+}
 
 /* ──────────────────────────────────────────────
    RENDERIZAR PRODUCTOS
 ────────────────────────────────────────────── */
 function renderProductos() {
+  if (!productsGrid) return;
+
   const lista = filtroActivo === 'todos'
     ? PRODUCTOS
     : PRODUCTOS.filter(p => p.categoria === filtroActivo);
@@ -184,26 +223,29 @@ function cambiarQtyCarrito(id, delta) {
 ────────────────────────────────────────────── */
 function actualizarCarrito() {
   const items = Object.values(carrito);
-  const totalQty   = items.reduce((s, i) => s + i.qty, 0);
+  const totalQty = items.reduce((s, i) => s + i.qty, 0);
   const totalPrecio = items.reduce((s, i) => s + i.precio * i.qty, 0);
 
-  // Badge
-  cartBadge.textContent = totalQty;
+  if (cartBadge) cartBadge.textContent = totalQty;
 
-  // Footer del carrito
-  if (items.length > 0) {
-    cartSubtotal.textContent = `S/ ${totalPrecio.toFixed(2)}`;
-    cartTotalText.textContent = `S/ ${totalPrecio.toFixed(2)}`;
-    cartFooter.style.display = 'block';
-  } else {
-    cartFooter.style.display = 'none';
+  if (cartSubtotal && cartTotalText && cartFooter) {
+    if (items.length > 0) {
+      cartSubtotal.textContent = `S/ ${totalPrecio.toFixed(2)}`;
+      cartTotalText.textContent = `S/ ${totalPrecio.toFixed(2)}`;
+      cartFooter.style.display = 'block';
+    } else {
+      cartFooter.style.display = 'none';
+    }
   }
+  guardarCarrito();
 }
 
 /* ──────────────────────────────────────────────
    CARRITO: Renderizar items en el sidebar
 ────────────────────────────────────────────── */
 function renderCarritoBody() {
+  if (!cartBody) return;
+
   const items = Object.values(carrito);
 
   if (items.length === 0) {
@@ -238,14 +280,14 @@ function renderCarritoBody() {
 ────────────────────────────────────────────── */
 function abrirCarrito() {
   renderCarritoBody();
-  cartOverlay.classList.add('open');
-  cartSidebar.classList.add('open');
+  cartOverlay?.classList.add('open');
+  cartSidebar?.classList.add('open');
   document.body.style.overflow = 'hidden';
 }
 
 function cerrarCarrito() {
-  cartOverlay.classList.remove('open');
-  cartSidebar.classList.remove('open');
+  cartOverlay?.classList.remove('open');
+  cartSidebar?.classList.remove('open');
   document.body.style.overflow = '';
 }
 
@@ -259,22 +301,22 @@ function confirmarPago() {
   const total = items.reduce((s, i) => s + i.precio * i.qty, 0);
   const ahora = new Date();
 
-  // Registrar en historial
   compras.unshift({
     id: Date.now(),
-    fecha: ahora,
+    fecha: ahora.toISOString(),
     items: items.map(i => ({ nombre: i.nombre, qty: i.qty, subtotal: i.precio * i.qty })),
     total,
   });
 
-  // Limpiar carrito
+  guardarCompras();
+
   carrito = {};
+  guardarCarrito();
   actualizarCarrito();
   renderCarritoBody();
   renderProductos();
   renderCompras();
 
-  // Cerrar carrito y abrir modal
   cerrarCarrito();
   abrirModalPago();
 }
@@ -283,25 +325,24 @@ function confirmarPago() {
    MODAL DE PAGO: Animación check
 ────────────────────────────────────────────── */
 function abrirModalPago() {
-  // Reiniciar animaciones SVG
   const circle = document.querySelector('.check-circle');
-  const mark   = document.querySelector('.check-mark');
+  const mark = document.querySelector('.check-mark');
 
-  // Forzar reflow para que la animación corra de nuevo
-  circle.style.animation = 'none';
-  mark.style.animation = 'none';
-  void circle.offsetWidth; // trigger reflow
-  void mark.offsetWidth;
+  if (circle && mark) {
+    circle.style.animation = 'none';
+    mark.style.animation = 'none';
+    void circle.offsetWidth;
+    void mark.offsetWidth;
+    circle.style.animation = '';
+    mark.style.animation = '';
+  }
 
-  circle.style.animation = '';
-  mark.style.animation = '';
-
-  payModal.classList.add('open');
+  payModal?.classList.add('open');
   document.body.style.overflow = 'hidden';
 }
 
 function cerrarModalPago() {
-  payModal.classList.remove('open');
+  payModal?.classList.remove('open');
   document.body.style.overflow = '';
 }
 
@@ -309,6 +350,8 @@ function cerrarModalPago() {
    HISTORIAL DE COMPRAS: Renderizar
 ────────────────────────────────────────────── */
 function renderCompras() {
+  if (!comprasList || !comprasEmpty) return;
+
   if (compras.length === 0) {
     comprasEmpty.style.display = 'block';
     comprasList.innerHTML = '';
@@ -318,7 +361,7 @@ function renderCompras() {
   comprasEmpty.style.display = 'none';
 
   comprasList.innerHTML = compras.map((compra, i) => {
-    const fecha = compra.fecha.toLocaleDateString('es-PE', {
+    const fecha = fechaCompra(compra).toLocaleDateString('es-PE', {
       day: '2-digit', month: 'long', year: 'numeric',
       hour: '2-digit', minute: '2-digit',
     });
@@ -360,8 +403,8 @@ function inicializarFiltros() {
    BADGE: Animación pop
 ────────────────────────────────────────────── */
 function animarBadge() {
-  cartBadge.classList.add('pop');
-  setTimeout(() => cartBadge.classList.remove('pop'), 300);
+  cartBadge?.classList.add('pop');
+  setTimeout(() => cartBadge?.classList.remove('pop'), 300);
 }
 
 /* ──────────────────────────────────────────────
@@ -369,6 +412,7 @@ function animarBadge() {
 ────────────────────────────────────────────── */
 let toastTimer;
 function mostrarToast(msg) {
+  if (!toastEl) return;
   toastEl.textContent = msg;
   toastEl.classList.add('show');
   clearTimeout(toastTimer);
@@ -378,20 +422,22 @@ function mostrarToast(msg) {
 /* ──────────────────────────────────────────────
    EVENT LISTENERS
 ────────────────────────────────────────────── */
-// Carrito
-cartTrigger.addEventListener('click', abrirCarrito);
-cartClose.addEventListener('click', cerrarCarrito);
-cartOverlay.addEventListener('click', cerrarCarrito);
+cartTrigger?.addEventListener('click', abrirCarrito);
+cartClose?.addEventListener('click', cerrarCarrito);
+cartOverlay?.addEventListener('click', cerrarCarrito);
 
-// Pago
-payBtn.addEventListener('click', confirmarPago);
-payModalClose.addEventListener('click', () => {
+payBtn?.addEventListener('click', confirmarPago);
+
+payModalClose?.addEventListener('click', () => {
   cerrarModalPago();
-  // Scroll suave a historial de compras
-  document.getElementById('comprasSection').scrollIntoView({ behavior: 'smooth' });
+  if (esPaginaTienda) {
+    window.location.href = 'historial.html';
+  } else {
+    document.getElementById('comprasSection')?.scrollIntoView({ behavior: 'smooth' });
+    renderCompras();
+  }
 });
 
-// Cerrar modal con ESC
 document.addEventListener('keydown', e => {
   if (e.key === 'Escape') {
     cerrarCarrito();
@@ -403,7 +449,9 @@ document.addEventListener('keydown', e => {
    INIT
 ────────────────────────────────────────────── */
 (function init() {
-  inicializarFiltros();
+  cargarEstado();
+  if (filtrosBtns.length) inicializarFiltros();
   renderProductos();
+  actualizarCarrito();
   renderCompras();
 })();
